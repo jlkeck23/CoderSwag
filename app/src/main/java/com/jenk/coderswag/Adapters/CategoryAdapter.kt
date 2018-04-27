@@ -15,20 +15,29 @@ class CategoryAdapter(context : Context, categories: List<Category>) : BaseAdapt
     val context = context
     val categories = categories
 
+    //this is being used to create views for our custom list class
     override fun getView(position: Int, convertView: View?, parent: ViewGroup?): View {
         val categoryView: View
-
-        categoryView = LayoutInflater.from(context).inflate(R.layout.category_list_item, null)
-        val categoryImage : ImageView = categoryView.findViewById(R.id.categoryImage)
-        val categoryName : TextView = categoryView.findViewById(R.id.categoryName)
-        println("Heavy Computing")
+        val holder : ViewHolder
+        //if a view does not exist yet we create it here
+        if(convertView == null){
+            categoryView = LayoutInflater.from(context).inflate(R.layout.category_list_item, null)
+            holder = ViewHolder()
+            holder.categoryImage = categoryView.findViewById(R.id.categoryImage)
+            holder.categoryName = categoryView.findViewById(R.id.categoryName)
+            categoryView.tag = holder
+        }
+        //else we recycle the view so we do not waste resources
+        else{
+            holder = convertView.tag as ViewHolder
+            categoryView = convertView
+        }
 
         val category = categories[position]
 
         val resourceId = context.resources.getIdentifier(category.image, "drawable", context.packageName)
-        categoryImage.setImageResource(resourceId)
-        println(resourceId)
-        categoryName.text = category.title
+        holder.categoryImage?.setImageResource(resourceId)
+        holder.categoryName?.text = category.title
         return categoryView
     }
 
@@ -44,6 +53,13 @@ class CategoryAdapter(context : Context, categories: List<Category>) : BaseAdapt
     override fun getCount(): Int {
         //returning the number of rows in the array that needs to be displayed
         return categories.count()
+    }
+
+    private class ViewHolder{
+
+        var categoryImage: ImageView? = null
+        var categoryName: TextView? = null
+
     }
 
 }
